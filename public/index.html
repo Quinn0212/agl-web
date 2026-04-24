@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Growth Lab &mdash; AI Education Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="loading-bar"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="logo-transparent.png" alt="AI Growth Lab" width="42" height="42" loading="eager" decoding="async" fetchpriority="high">
+    <div class="nav-logo-text">AI <em>GROWTH</em> LAB</div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#courses">Courses</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">AI Business Education Platform</div>
+    <h1 class="hero-title">
+      <span class="l1">MASTER</span>
+      <span class="l2">ARTIFICIAL</span>
+      <span class="l3">INTELLIGENCE</span>
+    </h1>
+    <p class="hero-sub">Accelerate your career and business growth with practical, results-driven AI courses designed for the Malaysian market.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="scrollToCourses()">Explore Courses &rarr;</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">1,200+</div><div class="hero-stat-label">Enrolled Students</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">98%</div><div class="hero-stat-label">Satisfaction Rate</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">$8</div><div class="hero-stat-label">Starting Price</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="courses-section" id="courses">
+  <div class="section-header reveal">
+    <span class="section-tag">Premium Curriculum</span>
+    <h2 class="section-title">OUR <em>COURSE</em></h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="courses-grid">
+    <div class="course-card reveal">
+      <div class="course-card-img">
+        <img class="course-card-img-photo" src="img/course-ai-cosplay.jpg" alt="AI Cosplay Tutorial" width="480" height="240" loading="lazy" decoding="async">
+        <div class="course-card-img-overlay"></div>
+      </div>
+      <div class="course-badge badge-new">NEW</div>
+      <div class="course-card-body">
+        <div class="course-level">Beginner &mdash; Intermediate</div>
+        <h3 class="course-title">AI Cosplay Tutorial</h3>
+        <p class="course-desc">Master the art of AI-generated cosplay &mdash; create stunning character visuals, transform photos, and build jaw-dropping content using the latest AI image tools. No design experience needed.</p>
+        <div class="course-footer">
+          <div class="course-price-wrap">
+            <div class="course-price-sale">$8</div>
+            <div class="course-price-orig">$39</div>
+            <div class="course-price-note">One-time &bull; Lifetime access</div>
+          </div>
+          <button class="btn-enroll" onclick="openPayment()">Enroll Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <img src="logo-transparent.png" alt="AI Growth Lab" width="42" height="42" loading="lazy" decoding="async">
+      <p class="footer-brand-text">AI Growth Lab is Malaysia's leading AI education platform &mdash; helping individuals master artificial intelligence for career and business growth.</p>
+    </div>
+    <div class="footer-col"><div class="footer-col-title">Courses</div><a href="#">AI Cosplay Tutorial</a></div>
+    <div class="footer-col"><div class="footer-col-title">Platform</div><a href="#">About Us</a></div>
+    <div class="footer-col">
+      <div class="footer-col-title">Contact</div>
+      <a href="mailto:aigrowthlab1122@gmail.com">Email</a>
+      <a href="https://www.instagram.com/aigrowthlab_1st/?utm_source=ig_web_button_share_sheet" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; 2025 AI Growth Lab. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal-payment">
+    <button class="modal-close" onclick="closeModal('paymentModal')">&#10005;</button>
+    <div class="payment-logo">
+      <img src="logo-transparent.png" alt="AI Growth Lab" width="36" height="36" loading="lazy" decoding="async">
+    </div>
+    <div class="payment-title">CHECKOUT</div>
+    <p class="payment-subtitle">Secure payment &bull; Instant access</p>
+    <div class="payment-order">
+      <div class="payment-order-label">Order Summary</div>
+      <div class="payment-order-name">AI Cosplay Tutorial</div>
+      <div class="payment-price-row">
+        <div class="payment-order-amount">$8</div>
+        <div class="payment-order-orig">$39</div>
+      </div>
+      <div class="payment-order-note">One-time payment &bull; Lifetime access &bull; You save $31</div>
+    </div>
+
+    <div id="payFormWrap">
+      <div class="payment-methods-label">Select Payment Method</div>
+
+      <!-- TNG -->
+      <button class="payment-method-btn selected" id="btnTNG" onclick="selectMethod('tng')">
+        <div class="pm-icon tng">&#x1F4B3;</div>
+        <div class="pm-info"><div class="pm-name">Touch 'n Go eWallet</div><div class="pm-desc">Scan QR &bull; Send receipt to confirm</div></div>
+        <div class="pm-radio"></div>
+      </button>
+
+      <!-- Alipay -->
+      <button class="payment-method-btn" id="btnAlipay" onclick="selectMethod('alipay')">
+        <div class="pm-icon" style="background:linear-gradient(135deg,#0a5eb5,#1677FF);border:1px solid rgba(255,255,255,.08);">&#x1F4B0;</div>
+        <div class="pm-info"><div class="pm-name">Alipay &#x652F;&#x4ED8;&#x5B9D;</div><div class="pm-desc">Scan QR &mdash; payment detected automatically</div></div>
+        <div class="pm-radio"></div>
+      </button>
+
+      <!-- Stripe -->
+      <button class="payment-method-btn" id="btnStripe" onclick="selectMethod('stripe')">
+        <div class="pm-icon" style="background:linear-gradient(135deg,#1a1a3e,#635BFF);border:1px solid rgba(255,255,255,.08);">&#x1F4B3;</div>
+        <div class="pm-info"><div class="pm-name">Credit / Debit Card</div><div class="pm-desc">Visa, Mastercard, Amex &mdash; via Stripe</div></div>
+        <div class="pm-radio"></div>
+      </button>
+
+      <!-- ═══ TNG Panel ═══ -->
+      <div id="tngPanel">
+        <div class="tng-qr">
+          <div class="tng-qr-label">SCAN WITH TOUCH 'N GO</div>
+          <div id="tngQRBox">
+            <img src="img/tng-qr.jpeg" width="180" height="180" alt="TNG QR Code" style="border-radius:6px;display:block;">
+          </div>
+        </div>
+        <div class="tng-receipt-box">
+          <div class="tng-receipt-title">&#x1F4CB; After Payment</div>
+          <ol class="tng-receipt-steps">
+            <li>Take a screenshot of your TNG payment receipt</li>
+            <li>Send it to <a href="mailto:aigrowthlab1122@gmail.com">aigrowthlab1122@gmail.com</a> or <a href="https://www.instagram.com/aigrowthlab_1st/" target="_blank" rel="noopener">Instagram DM</a></li>
+            <li>We will verify &amp; send you course access within 24 hours</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- ═══ Alipay Panel ═══ -->
+      <div id="alipayPanel" style="display:none;">
+        <div class="tng-qr">
+          <div class="tng-qr-label">SCAN WITH ALIPAY &#x652F;&#x4ED8;&#x5B9D;</div>
+          <div id="alipayQRBox" style="display:flex;justify-content:center;align-items:center;min-height:160px;">
+            <div class="pay-waiting">
+              <div class="pay-waiting-dots"><span></span><span></span><span></span></div>
+              <div class="pay-waiting-text">Generating QR code...</div>
+            </div>
+          </div>
+          <div class="tng-qr-timer" id="alipayTimer"></div>
+        </div>
+        <!-- No button — auto-detects via backend polling -->
+        <div id="alipayWaiting" class="pay-waiting" style="display:none;">
+          <div class="pay-waiting-dots"><span></span><span></span><span></span></div>
+          <div class="pay-waiting-text">Waiting for payment...</div>
+        </div>
+      </div>
+
+      <!-- ═══ Stripe Panel ═══ -->
+      <div id="stripePanel" style="display:none;">
+        <div style="margin-bottom:14px;">
+          <div id="stripe-card-element" style="background:var(--black-card2);border:1px solid rgba(255,255,255,.1);padding:15px 16px;border-radius:2px;margin-bottom:8px;min-height:46px;"></div>
+          <div id="stripe-card-errors" style="color:var(--red-bright);font-family:var(--font-body);font-size:12px;min-height:16px;"></div>
+        </div>
+        <button class="btn-pay" id="stripePayBtn" onclick="stripeSubmit()">PAY $8 NOW</button>
+        <!-- Stripe auto-confirms after card submit — no polling needed -->
+      </div>
+
+      <div class="payment-secure">&#x1F512; Secured by SSL &bull; Stripe PCI DSS &bull; Your data is protected</div>
+    </div>
+
+    <div class="payment-success" id="paySuccess">
+      <div class="success-icon">&#x2705;</div>
+      <div class="success-title">PAYMENT CONFIRMED</div>
+      <p class="success-text">Welcome to AI Cosplay Tutorial!<br>Check your email for access details.<br><br>Order ID: <strong id="orderId"></strong></p>
+    </div>
+  </div>
+</div>
+
+<script src="payment.js"></script>
+</body>
+</html>
