@@ -11,7 +11,6 @@ var selectedMethod     = 'tng';
 var stripeInstance     = null;
 var stripeCard         = null;
 var qrInterval         = null;
-var alipaySourceId     = null;
 var pollInterval       = null;
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -81,12 +80,22 @@ function startQRTimer(seconds, elId){
 }
 
 // ════════════════════════════════════════════════════════════
-// ALIPAY — Stripe Source, poll /api/payment-status every 3s
+// ALIPAY — Stripe PaymentIntent + redirect (new API)
+// User clicks button → redirected to Alipay → pays → returns
 // ════════════════════════════════════════════════════════════
 function initAlipay(){
-  var box = document.getElementById('alipayQRBox');
-  box.innerHTML = '<div class="pay-waiting"><div class="pay-waiting-dots"><span></span><span></span><span></span></div><div class="pay-waiting-text">Generating QR code...</div></div>';
-  document.getElementById('alipayWaiting').style.display = 'none';
+  // Nothing to init — just show the panel, user clicks button to proceed
+  document.getElementById('alipayError').textContent = '';
+  var btn = document.getElementById('alipayPayBtn');
+  btn.disabled = false;
+  btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
+}
+
+function alipayRedirect(){
+  var btn = document.getElementById('alipayPayBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting\u2026';
+  document.getElementById('alipayError').textContent = '';
 
   fetch('/api/alipay-create', {
     method: 'POST',
@@ -95,43 +104,23 @@ function initAlipay(){
   })
   .then(function(r){ return r.json(); })
   .then(function(data){
-    if(!data.qr_url){
-      box.innerHTML = '<div style="color:var(--red-bright);font-family:var(--font-body);font-size:12px;padding:16px;text-align:center;">Failed to generate QR. Please try another method.</div>';
-      return;
+    if(data.redirect_url){
+      // Redirect to Alipay payment page
+      window.location.href = data.redirect_url;
+    } else if(data.error){
+      document.getElementById('alipayError').textContent = data.error;
+      btn.disabled = false;
+      btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
+    } else {
+      document.getElementById('alipayError').textContent = 'Could not create payment. Please try another method.';
+      btn.disabled = false;
+      btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
     }
-
-    alipaySourceId = data.payment_id;
-
-    box.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='
-      + encodeURIComponent(data.qr_url)
-      + '" width="160" height="160" style="background:white;padding:8px;border-radius:4px;" alt="Alipay QR">';
-
-    document.getElementById('alipayWaiting').style.display = 'flex';
-    startQRTimer(300, 'alipayTimerEl');
-
-    // Auto-detect payment — no button needed
-    pollInterval = setInterval(function(){
-      fetch('/api/payment-status?id=' + alipaySourceId)
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if(d.status === 'succeeded'){
-          stopPolling();
-          clearInterval(qrInterval);
-          showProcessing(function(){ showSuccess(alipaySourceId); });
-        } else if(d.status === 'failed' || d.status === 'canceled'){
-          stopPolling();
-          clearInterval(qrInterval);
-          box.innerHTML = '<div style="color:var(--red-bright);font-family:var(--font-body);font-size:12px;padding:16px;text-align:center;">Payment failed or expired. Please try again.</div>';
-          document.getElementById('alipayWaiting').style.display = 'none';
-        }
-      })
-      .catch(function(){});
-    }, 3000);
-
-    setTimeout(function(){ stopPolling(); clearInterval(qrInterval); }, 300000);
   })
   .catch(function(){
-    box.innerHTML = '<div style="color:var(--red-bright);font-family:var(--font-body);font-size:12px;padding:16px;text-align:center;">Network error. Please try again.</div>';
+    document.getElementById('alipayError').textContent = 'Network error. Please try again.';
+    btn.disabled = false;
+    btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
   });
 }
 

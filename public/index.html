@@ -159,21 +159,15 @@
 
       <!-- ═══ Alipay Panel ═══ -->
       <div id="alipayPanel" style="display:none;">
-        <div class="tng-qr">
-          <div class="tng-qr-label">SCAN WITH ALIPAY &#x652F;&#x4ED8;&#x5B9D;</div>
-          <div id="alipayQRBox" style="display:flex;justify-content:center;align-items:center;min-height:160px;">
-            <div class="pay-waiting">
-              <div class="pay-waiting-dots"><span></span><span></span><span></span></div>
-              <div class="pay-waiting-text">Generating QR code...</div>
-            </div>
-          </div>
-          <div class="tng-qr-timer" id="alipayTimer"></div>
+        <div class="alipay-info-box">
+          <div style="font-size:32px;text-align:center;margin-bottom:10px;">&#x1F4B0;</div>
+          <p style="font-family:var(--font-body);font-size:13px;color:var(--grey-light);text-align:center;line-height:1.7;margin-bottom:16px;">
+            You will be redirected to Alipay to complete payment.<br>
+            After paying, you'll return here automatically.
+          </p>
+          <div id="alipayError" style="color:var(--red-bright);font-family:var(--font-body);font-size:12px;text-align:center;min-height:16px;margin-bottom:8px;"></div>
         </div>
-        <!-- No button — auto-detects via backend polling -->
-        <div id="alipayWaiting" class="pay-waiting" style="display:none;">
-          <div class="pay-waiting-dots"><span></span><span></span><span></span></div>
-          <div class="pay-waiting-text">Waiting for payment...</div>
-        </div>
+        <button class="btn-pay" id="alipayPayBtn" onclick="alipayRedirect()">PAY WITH ALIPAY &#x652F;&#x4ED8;&#x5B9D;</button>
       </div>
 
       <!-- ═══ Stripe Panel ═══ -->

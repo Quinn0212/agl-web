@@ -1,4 +1,4 @@
-// api/payment-status.js — polls the status of an Alipay / Stripe source
+// api/payment-status.js — checks the status of a PaymentIntent
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -12,32 +12,8 @@ export default async function handler(req, res) {
   if (!id) return res.status(400).json({ error: 'Missing payment id' });
 
   try {
-    // For Alipay Source
-    if (id.startsWith('src_')) {
-      const source = await stripe.sources.retrieve(id);
-
-      // If source is chargeable, charge it
-      if (source.status === 'chargeable') {
-        const charge = await stripe.charges.create({
-          amount:   source.amount,
-          currency: source.currency,
-          source:   id,
-        });
-        return res.status(200).json({
-          status: charge.status === 'succeeded' ? 'succeeded' : 'pending',
-        });
-      }
-
-      return res.status(200).json({ status: source.status }); // pending / failed / canceled
-    }
-
-    // For Stripe PaymentIntent
-    if (id.startsWith('pi_')) {
-      const intent = await stripe.paymentIntents.retrieve(id);
-      return res.status(200).json({ status: intent.status });
-    }
-
-    return res.status(200).json({ status: 'unknown' });
+    const intent = await stripe.paymentIntents.retrieve(id);
+    res.status(200).json({ status: intent.status });
   } catch (err) {
     console.error('Status check error:', err);
     res.status(500).json({ error: err.message });

@@ -177,3 +177,6 @@ footer{background:#050505;border-top:1px solid rgba(192,57,43,.13);padding:68px 
 .tng-receipt-steps li{margin-bottom:2px;}
 .tng-receipt-steps a{color:var(--red-bright);text-decoration:none;}
 .tng-receipt-steps a:hover{text-decoration:underline;}
+
+/* ── Alipay redirect panel ── */
+.alipay-info-box{background:rgba(22,119,255,.06);border:1px solid rgba(22,119,255,.22);border-radius:3px;padding:18px;margin-bottom:14px;}

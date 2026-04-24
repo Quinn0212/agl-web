@@ -1,15 +1,14 @@
 {
   "name": "aigrowthlab",
   "version": "1.0.0",
-  "description": "AI Growth Lab — AI Education Platform",
+  "description": "AI Growth Lab \u2014 AI Education Platform",
   "private": true,
   "scripts": {
     "dev": "vercel dev",
     "deploy": "vercel --prod"
   },
   "dependencies": {
-    "stripe": "^14.10.0",
-    "@vercel/kv": "^2.0.0"
+    "stripe": "^14.10.0"
   },
   "engines": {
     "node": ">=18.0.0"

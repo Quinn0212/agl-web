@@ -1,4 +1,4 @@
-// api/alipay-create.js — creates an Alipay payment via Stripe Sources
+// api/alipay-create.js — creates an Alipay payment via Payment Intents (new API)
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -10,21 +10,31 @@ export default async function handler(req, res) {
 
   try {
     const { amount, currency } = req.body;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aigrowthlab.vercel.app';
 
-    // Create an Alipay source via Stripe
-    const source = await stripe.sources.create({
-      type: 'alipay',
-      amount: amount,       // e.g. 800 = $8.00
+    // Create a PaymentIntent specifically for Alipay
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,           // in cents, e.g. 800 = $8.00
       currency: currency || 'usd',
-      redirect: {
-        return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://aigrowthlab.vercel.app'}/payment-success`,
-      },
+      payment_method_types: ['alipay'],
+      description: 'AI Cosplay Tutorial — AI Growth Lab',
     });
 
+    // Confirm it with Alipay redirect — Stripe returns a URL
+    const confirmed = await stripe.paymentIntents.confirm(paymentIntent.id, {
+      payment_method: 'alipay',
+      return_url: `${baseUrl}/alipay-return.html?pi=${paymentIntent.id}`,
+    });
+
+    // The redirect URL sends user to Alipay's payment page
+    const redirectUrl = confirmed.next_action?.alipay_handle_redirect?.url
+                     || confirmed.next_action?.redirect_to_url?.url
+                     || null;
+
     res.status(200).json({
-      qr_url:     source.alipay?.native_url || source.redirect?.url,
-      payment_id: source.id,
-      status:     source.status,
+      redirect_url: redirectUrl,
+      payment_id:   paymentIntent.id,
+      client_secret: paymentIntent.client_secret,
     });
   } catch (err) {
     console.error('Alipay error:', err);
