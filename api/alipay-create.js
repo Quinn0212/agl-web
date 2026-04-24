@@ -13,9 +13,10 @@ export default async function handler(req, res) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aigrowthlab.vercel.app';
 
     // Create a PaymentIntent specifically for Alipay
+    // Alipay in Malaysia only supports MYR and CNY
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,           // in cents, e.g. 800 = $8.00
-      currency: currency || 'usd',
+      amount: 3500,              // RM 35.00 in cents (≈ $8 USD)
+      currency: 'myr',
       payment_method_types: ['alipay'],
       description: 'AI Cosplay Tutorial — AI Growth Lab',
     });
