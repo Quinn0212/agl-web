@@ -80,15 +80,17 @@ function startQRTimer(seconds, elId){
 }
 
 // ════════════════════════════════════════════════════════════
-// ALIPAY — Stripe PaymentIntent + redirect (new API)
-// User clicks button → redirected to Alipay → pays → returns
+// ALIPAY — Stripe PaymentIntent + Stripe.js confirmAlipayPayment
+// Backend creates intent → frontend confirms with redirect
 // ════════════════════════════════════════════════════════════
 function initAlipay(){
-  // Nothing to init — just show the panel, user clicks button to proceed
   document.getElementById('alipayError').textContent = '';
   var btn = document.getElementById('alipayPayBtn');
   btn.disabled = false;
   btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
+
+  // Make sure Stripe.js is loaded (shared with credit card)
+  if(!stripeInstance) loadStripeJS();
 }
 
 function alipayRedirect(){
@@ -97,38 +99,63 @@ function alipayRedirect(){
   btn.textContent = 'Redirecting\u2026';
   document.getElementById('alipayError').textContent = '';
 
-  fetch('/api/alipay-create', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ amount: 800, currency: 'usd' })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    if(data.redirect_url){
-      // Redirect to Alipay payment page
-      window.location.href = data.redirect_url;
-    } else if(data.error){
-      document.getElementById('alipayError').textContent = data.error;
+  // Ensure Stripe.js is loaded first
+  function proceed(){
+    if(!stripeInstance){
+      document.getElementById('alipayError').textContent = 'Payment system loading, please try again.';
       btn.disabled = false;
       btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
-    } else {
-      document.getElementById('alipayError').textContent = 'Could not create payment. Please try another method.';
-      btn.disabled = false;
-      btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
+      return;
     }
-  })
-  .catch(function(){
-    document.getElementById('alipayError').textContent = 'Network error. Please try again.';
-    btn.disabled = false;
-    btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
-  });
+
+    // Step 1: Backend creates PaymentIntent
+    fetch('/api/alipay-create', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.error){
+        document.getElementById('alipayError').textContent = data.error;
+        btn.disabled = false;
+        btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
+        return;
+      }
+
+      // Step 2: Stripe.js confirms and redirects to Alipay
+      return stripeInstance.confirmAlipayPayment(data.client_secret, {
+        return_url: window.location.origin + '/alipay-return.html?pi=' + data.payment_id,
+      });
+    })
+    .then(function(result){
+      if(result && result.error){
+        document.getElementById('alipayError').textContent = result.error.message;
+        btn.disabled = false;
+        btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
+      }
+      // If no error, browser is redirecting to Alipay — nothing else to do
+    })
+    .catch(function(err){
+      document.getElementById('alipayError').textContent = 'Network error. Please try again.';
+      btn.disabled = false;
+      btn.innerHTML = 'PAY WITH ALIPAY \u652F\u4ED8\u5B9D';
+    });
+  }
+
+  if(stripeInstance) proceed();
+  else setTimeout(proceed, 1500); // give Stripe.js a moment to load
 }
 
 // ════════════════════════════════════════════════════════════
-// STRIPE — confirmCardPayment resolves synchronously ✅
+// STRIPE.JS loader — shared by Credit Card and Alipay
 // ════════════════════════════════════════════════════════════
-function initStripe(){
-  if(stripeInstance) return;
+var stripeJSLoading = false;
+
+function loadStripeJS(callback){
+  if(stripeInstance){ if(callback) callback(); return; }
+  if(stripeJSLoading) return; // already loading
+  stripeJSLoading = true;
 
   var s = document.createElement('script');
   s.src = 'https://js.stripe.com/v3/';
@@ -137,21 +164,31 @@ function initStripe(){
     .then(function(r){ return r.json(); })
     .then(function(d){
       stripeInstance = Stripe(d.publishableKey);
-      var elements = stripeInstance.elements();
-      stripeCard = elements.create('card',{
-        style:{
-          base:{ color:'#ffffff', fontFamily:'DM Sans, sans-serif', fontSize:'15px', '::placeholder':{color:'#666'} },
-          invalid:{ color:'#E74C3C' }
-        }
-      });
-      document.getElementById('stripe-card-element').innerHTML = '';
-      stripeCard.mount('#stripe-card-element');
-      stripeCard.on('change', function(e){
-        document.getElementById('stripe-card-errors').textContent = e.error ? e.error.message : '';
-      });
+      if(callback) callback();
     });
   };
   document.head.appendChild(s);
+}
+
+// ════════════════════════════════════════════════════════════
+// STRIPE — Credit/Debit Card
+// ════════════════════════════════════════════════════════════
+function initStripe(){
+  loadStripeJS(function(){
+    if(stripeCard) return; // already mounted
+    var elements = stripeInstance.elements();
+    stripeCard = elements.create('card',{
+      style:{
+        base:{ color:'#ffffff', fontFamily:'DM Sans, sans-serif', fontSize:'15px', '::placeholder':{color:'#666'} },
+        invalid:{ color:'#E74C3C' }
+      }
+    });
+    document.getElementById('stripe-card-element').innerHTML = '';
+    stripeCard.mount('#stripe-card-element');
+    stripeCard.on('change', function(e){
+      document.getElementById('stripe-card-errors').textContent = e.error ? e.error.message : '';
+    });
+  });
 }
 
 function stripeSubmit(){
